@@ -12,7 +12,7 @@
 > - RAM: 32 GB, 6400 MT/s
 > - OS: Windows 11 Home 23H2
 > - Näytön resoluutio: 2880x1800 (175% skaalaus)
-> - SSD: 761/951 GB vapaana
+> - SSD: 745/951 GB vapaana
 >
 > Virtuaalikoneena VirtualBoxiin asennettu Debian 12 Bookworm.
 
@@ -51,7 +51,15 @@ top.sls-tiedostoa hyödyntämällä ei tarvitse erikseen määrittää komennois
 
 VMwaren (2024) artikkelissa esitellään Saltia ja YAML merkintäkieltä, johon tässä tiivistelmässä keskitytään. Salt käyttää oletuksena YAML:ää kääntämään kyseisen merkintäkielen datarakenteen Saltin ymmärtämäksi Python datarakenteeksi. YAML rakentuu avain-arvo pareista, jotka erotetaan toisistaan kaksoispisteellä, jota seuraa täsmälleen yksi välilyönti (": "). Näitä avain-arvo pareja on kaikkiaan kolmenlaisia: skalaarinen (arvo voi olla luku, teksti tai totuusarvo), lista (sisältää skalaareja) ja sanakirja (sisältää skalaareja ja listoja). YAML:n rakenne erottelee isot ja pienet kirjaimet toisistaan, minkä lisäksi ainakin yhtä välilyöntiä on käytettävä hyödynnettäessä lista- tai sanakirja blokkirakennetta, joskin kaksi välilyöntiä on vakioitunut standardiksi.
 
+## a) Hello Vagrant!
+
+*0:00*
+
+Koska minulla ei ollut vielä Vagrantia asennettuna, aloitin tehtävän asentamalla sen. Olen tähän asti käyttänyt Linuxia VirtualBoxilla tehdyllä virtuaalikoneella, minkä myötä tehtävänannon vinkin (ks. Karvinen 10.5.2024) takia päätin asentaa Vagrantin isäntäjärjestelmänä olevaan Windows 11:een. Karvisen (4.11.2021) artikkelissa oli linkki Windows version asennukseen (ks. Hashicorp 2024), josta latasin AMD64-pohjaisen Vagrantin (versio 2.4.2). Puolen minuutin latauksen jälkeen Windowsin Setup Wizard otti asennuksen hoidettavakseen ja itse asennusprosessi eteenpäin-nappien paineluiden kanssa vei reilut kolme minuuttia, minkä jälkeen sain kehoituksen tietokoneen uudelleen käynnistämisestä asennuksen saattamiseksi loppuun.
+
 ## Lähdeluettelo
+
+Hashicorp, 2024. Install Vagrant. Luettavissa: https://developer.hashicorp.com/vagrant/install. Luettu: 5.11.2024.
 
 Karvinen 28.3.2018. Salt Quickstart – Salt Stack Master and Slave on Ubuntu Linux. Luettavissa: https://terokarvinen.com/2018/03/28/salt-quickstart-salt-stack-master-and-slave-on-ubuntu-linux/. Luettu: 5.11.2024.
 
