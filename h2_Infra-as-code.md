@@ -55,11 +55,35 @@ VMwaren (2024) artikkelissa esitellään Saltia ja YAML merkintäkieltä, johon 
 
 *0:00*
 
-Koska minulla ei ollut vielä Vagrantia asennettuna, aloitin tehtävän asentamalla sen. Olen tähän asti käyttänyt Linuxia VirtualBoxilla tehdyllä virtuaalikoneella, minkä myötä tehtävänannon vinkin (ks. Karvinen 10.5.2024) takia päätin asentaa Vagrantin isäntäjärjestelmänä olevaan Windows 11:een. Karvisen (4.11.2021) artikkelissa oli linkki Windows version asennukseen (ks. Hashicorp 2024), josta latasin AMD64-pohjaisen Vagrantin (versio 2.4.2). Puolen minuutin latauksen jälkeen Windowsin Setup Wizard otti asennuksen hoidettavakseen ja itse asennusprosessi eteenpäin-nappien paineluiden kanssa vei reilut kolme minuuttia, minkä jälkeen sain kehoituksen tietokoneen uudelleen käynnistämisestä asennuksen saattamiseksi loppuun.
+Koska minulla ei ollut vielä Vagrantia asennettuna, aloitin tehtävän asentamalla sen. Olen tähän asti käyttänyt Linuxia VirtualBoxilla tehdyllä virtuaalikoneella, minkä myötä tehtävänannon vinkin (ks. Karvinen 10.5.2024) takia päätin asentaa Vagrantin isäntäjärjestelmänä olevaan Windows 11:een. Karvisen (4.11.2021) artikkelissa oli linkki Windows version asennukseen (ks. Hashicorp 2024a), josta latasin AMD64-pohjaisen Vagrantin (versio 2.4.2). Puolen minuutin latauksen jälkeen Windowsin Setup Wizard otti asennuksen hoidettavakseen ja itse asennusprosessi eteenpäin-nappien paineluiden kanssa vei reilut kolme minuuttia, minkä jälkeen sain kehoituksen tietokoneen uudelleen käynnistämisestä asennuksen saattamiseksi loppuun. Koneen käynnistyttyä uudelleen kävin läpi aloitusvalikkoni ohjelmat, mutten huomannut Vagrantia siellä. Googlaamalla pääsin Vagrantin etusivulle, josta oli suoraan linkit käyttöön liittyviin ohjeisiin, mistä sain tiedon, että Vagrantia käytetään suoraan komentoriviltä (Hashicorp 2024b). Ajoin komentorivillä komennon `vagrant -v`, joka näytti, että olin onnistuneesti asentanut oikean version ohjelmasta (ks. kuva alla).
+
+![vagrant install](https://github.com/user-attachments/assets/1c2a2c33-775d-4140-b90f-d11d64308c0e)
+
+## b) Linux Vagrant
+
+*0:09*
+
+Komentorivin käyttäminen Windowsissa erosi komennoiltaan jonkin verran Linuxista, joten etsin Googlella oppaan, jolla saisin varmistettua yleisimpien komentojen muodot. Koladen (9.8.2022) ohjesivu tarjosi vastaukset näihin ongelmiini. Navigoin ensin hakemistossa `cd`-komennoilla tämän viikon tehtäväkansiooni, johon loin Karvisen (4.11.2021) artikkelin mukaisesti kansion "twohost" komennolla `mkdir twohost`, ja siirryin sitten kyseiseen hakemistoon `cd twohost`-komennolla. Ei niin yllätyksekseni Windowsissa ei ole nano-editoria, joten käytin komentoa `notepad Vagrantfile.txt`, jolla loin uuden tekstitiedoston. Kopioin kyseiseen tiedostoon Karvisen (4.11.2021) artikkelista sisällön, joskin muutin käyttöjärjestelmän tietoihin "debian/bookworm64" tehtävänannon mukaisesti (ks. Karvinen 10.5.2024). Ajoin sitten artikkelin komennon `vagrant ssh t001`, mutta sain ilmoituksen, ettei ympäristöä Vagrantille ollut vielä luotuna ja minun pitäisi tätä varten ajaa komento `vagrant init`. Tein tämän ja sain ilmoituksen, että Vagrantfile-tiedosto (ei .txt loppuinen) oli luotu kansioon. Tarkistin asian graafisesta näkymästä ja totesin näin olevan asian laita, joten poistin edellä luomani Vagrantfile.txt-tiedoston komennolla `del Vagrantfile.txt` otettuani ensin tiedoston sisällön talteen leikepöydälle. Komennolla `notepad Vagrantfile` avasin oikean tiedoston ja liitin siihen edellä muokkaamani asetukset (ks. ensimmäinen kuva alla). Ajoin sitten uudelleen komennon `vagrant ssh t001`, mutta sain tällä kertaa ilmoituksen, ettei virtuaalikoneita ollut vielä luotu, ja tämä tapahtuisi komennolla `vagrant up`. Ajoin kyseisen komennon, joka aloitti muutaman minuutin pituisen lataus-/asennusprosessin (ks. keskimmäinen alla oleva kuva komennoista tähän asti). Prosessin tultua päätökseen pääsin viimein ajamaan onnistuneesti komennon `vagrant ssh t001`. Ajoin vielä komennon `pwd` varmistuakseni, että olin todella Linux-pohjaisessa virtuaalikoneessa (ks. alimmainen alla oleva kuva).
+
+![vagrantfile](https://github.com/user-attachments/assets/a65bf8a7-bdc2-4673-be51-067c90dba9c6)
+
+![vagrant commands](https://github.com/user-attachments/assets/1d89da66-5225-44f4-b7b6-8934487efa65)
+
+![vagrant login](https://github.com/user-attachments/assets/d809b091-811f-4f26-be9b-59b698f17dd7)
+
+## c) Kaksin kaunihimpi
+
+*0:19*
+
+Koska tehtävässä b) olin jo luonut kaksi virtuaalikonetta, siirryin suoraan testaamaan pingin toimimista. Koneelta t001 suoritin komennon `ping -c 1 192.168.88.102`, joka onnistui ongelmitta. Kirjauduin ulos komennolla `exit` ja siirryin koneelle t002 komennolla `vagrant ssh t002`, jossa pingasin vastavuoroisesti t001 IP-osoitetta komennolla `ping -c 1 192.168.88.101`. Tämäkin onnistui, joten pingasin vielä lopuksi Googlen DNS-palvelinta testimielessä jälleen ilman ongelmia (ks. kuva alla).
+
+![vagrant ping](https://github.com/user-attachments/assets/e4d9a652-ebda-4978-b134-0571c5cc3bbb)
 
 ## Lähdeluettelo
 
-Hashicorp, 2024. Install Vagrant. Luettavissa: https://developer.hashicorp.com/vagrant/install. Luettu: 5.11.2024.
+Hashicorp 2024a. Install Vagrant. Luettavissa: https://developer.hashicorp.com/vagrant/install. Luettu: 5.11.2024.
+
+Hashicorp 2024b. Install Vagrant. Luettavissa: https://developer.hashicorp.com/vagrant/tutorials/getting-started/getting-started-install. Luettu: 5.11.2024.
 
 Karvinen 28.3.2018. Salt Quickstart – Salt Stack Master and Slave on Ubuntu Linux. Luettavissa: https://terokarvinen.com/2018/03/28/salt-quickstart-salt-stack-master-and-slave-on-ubuntu-linux/. Luettu: 5.11.2024.
 
@@ -70,6 +94,8 @@ Karvinen, T. 28.3.2023. Salt Vagrant - automatically provision one master and tw
 Karvinen, T. 3.4.2024. Hello Salt Infra-as-Code. Luettavissa: https://terokarvinen.com/2024/hello-salt-infra-as-code/. Luettu: 5.11.2024.
 
 Karvinen, T. 10.5.2024. Palvelinten Hallinta. Luettavissa: https://terokarvinen.com/palvelinten-hallinta/. Luettu: 5.11.2024.
+
+Kolade, C. 9.8.2022. Command Line Commands – CLI Tutorial. Luettavissa: https://www.freecodecamp.org/news/command-line-commands-cli-tutorial/. Luettu: 5.11.2024.
 
 LeeviRaussi 29.10.2024. h1 Viisikko. Luettavissa: https://github.com/LeeviRaussi/Palvelinten_hallinta/blob/main/h1_Viisikko.md. Luettu: 4.11.2024.
 
