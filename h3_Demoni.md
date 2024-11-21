@@ -334,7 +334,9 @@ Lopputulokseen ei kuitenkaan ollut taaskaan vaikutusta.
 
 *4:32*
 
-Tässä kohtaa löin hanskat pöytään osittaisena luovutuksena. Itse nettisivu toimi kyllä, oikeudet olivat oikein (ks. alla oleva kuva), ainoa ongelma vain, ettei käyttäjälle pääse kirjautumaan sisälle. Saman työn voisi varmaan tehdä suoraviivaisesti t002:n vagrantille, jolloin uutta käyttäjää ei tarvitsisi luoda, mutta tämä tuntuu huonolta ratkaisulta pitkässä juoksussa. Ongelma lienee user.present-tilamodulissa, koska t001:llä homma toimi `àdduser`-komennolla, mutta mikä tämä ongelman ratkaisu sitten on onkin toinen asia.
+Tässä kohtaa löin hanskat pöytään osittaisena luovutuksena. Itse nettisivu toimi kyllä, oikeudet olivat oikein (ks. alla oleva kuva), ainoa ongelma vain, ettei käyttäjälle pääse kirjautumaan sisälle. Saman työn voisi varmaan tehdä suoraviivaisesti t002:n vagrantille, jolloin uutta käyttäjää ei tarvitsisi luoda, mutta tämä tuntuu huonolta ratkaisulta pitkässä juoksussa. Ongelma lienee user.present-tilamodulissa, koska t001:llä homma toimi `adduser`-komennolla, mutta mikä tämä ongelman ratkaisu sitten on onkin toinen asia.
+
+![34 owner](https://github.com/user-attachments/assets/4c11ca1d-15ca-4df4-bdae-224083558ae1)
 
 ## Lähdeluettelo
 
