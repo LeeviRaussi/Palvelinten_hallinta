@@ -338,9 +338,123 @@ Tässä kohtaa löin hanskat pöytään osittaisena luovutuksena. Itse nettisivu
 
 ![34 owner](https://github.com/user-attachments/assets/4c11ca1d-15ca-4df4-bdae-224083558ae1)
 
+### Lisäys palautuksen jälkeen
+
+Jatkoin tehtävän työstämistä tehtäviä käsitelleen luennon jälkeen, koska en ollut tyytyväinen puolittaiseen lopputulokseen, minkä lisäksi uskoin, että asian selvittäminen tulisi auttamaan itseäni myöhemmissäkin tehtävissä. Olin luennolla saanut myös muutamia neuvoja, miten voisin yrittää ratkoa ongelmiani. Aloitin kuitenkin putsaamalla orja-koneelta käyttäjän "weppimasteri" pois komennoilla `sudo salt '*' state.single user.absent weppimasteri` ja `sudo salt '*' state.single file.absent /home/weppimasteri/`.
+
+![35 cleaning](https://github.com/user-attachments/assets/8ca86bcf-8fef-47b9-877e-164601b9ca03)
+
+![36 clean result](https://github.com/user-attachments/assets/87c9ef5f-84bc-4ec0-9383-4b0134df245b)
+
+Tämän jälkeen hyöydynsin luennolla saamaani neuvoa käyttäjien salasanojen sijainnista ja annoin komennon `sudo cat /etc/shadow`. Täältä sain hash-muodossa olevan t001:lle luodun käyttäjän "weppimasteri" salasanan, jota aioin testata Saltin user.present-tilafunktioon. Päätin myös palata takaisin yhden moduulin käyttöön, joten siirryin hakemistoon /srv/salt/apache ja muokkasin sls-tiedostoon uudenlaisen user.present-tilanfunktion Saltin (2024d) manuaalin avulla.
+
+![37 new weppimasteri](https://github.com/user-attachments/assets/3198d433-4726-4706-b4a1-74a632b678b3)
+
+Käytännöllisyyden kannalta lisäsin käyttäjän myös sudo-ryhmään, jottei tarvetta hyppiä käyttäjältä toiselle tulisi enää myöhemmin. Lisäksi lähdin koostamaan sls-tiedostoa tällä kertaa oikeasti yksi askel kerrallaan, joten ajoin tekemäni lisäyksen jälkeen komennon `sudo salt '*' state.apply apache`.
+
+![38 salt weppimasteri](https://github.com/user-attachments/assets/a995632e-ed4d-4890-be0e-5f892a033d10)
+
+Yritin sitten kirjautua SSH-yhteydellä käyttäjätunnukselle onnistuen tässä viimein. Jostain syystä käyttäjätunnus ja käytössä oleva kone eivät ole näkyvissä toisin kuin ollessani t001:llä, mutta en jäänyt pohtimaan tätä sen enempää.
+
+![39 ssh weppimasteri](https://github.com/user-attachments/assets/7d8be530-c692-4159-b488-aa07a647ffe1)
+
+Lisäsin sitten conf-tiedoston luomisen sls-tiedostoon täsmälleen samassa muodossa kuin aiemmin, koska tämän suhteen ongelmaa ei ollut. Siirsin myös tarvittavan verkkosivun conf-tiedoston komennolla `sudo mv /srv/salt/weppi/esimerkki.conf /srv/salt/apache/` oikeaan hakemistoon. Tämän jälkeen ajoin jälleen komennon `sudo salt '*' state.apply apache`.
+
+![40 sls conf](https://github.com/user-attachments/assets/6170e401-7fcd-4ace-8100-d6645b9c5491)
+
+![41 salt conf](https://github.com/user-attachments/assets/8af95284-2cc7-4ed3-a6c5-11ab720f8caf)
+
+Seuraavaksi palasin muokkaamaan sls-tiedostoa hakemistojen ja tiedostojen luonnin kannalta. Aiemmin tekemäni ratkaisu oli kaikin tavoin kömpelö, joten halusin suoraviivaistaa koodia. Saltin (2024c) manuaalin avulla löysin tarvittavat parametrit, joilla saisin itse tilafunktiossa määriteltyä tiedoston omistajan, oikeudet ja ennestään olemassa olemattomien hakemistojen luonnin myös.
+
+![42 file managed](https://github.com/user-attachments/assets/059cf92e-f59c-43af-ae64-db4b3a4ea109)
+
+Komento `sudo salt '*' state.apply apache` toimi ensimmäisellä yrityksellä.
+
+![43 salt file managed](https://github.com/user-attachments/assets/d7176a62-4b95-45a8-bcbb-03dd3ba0896e)
+
+Avoimena olevalta t002:lta tarkastin, että tiedosto ja hakemistot oli todella luotu oikeilla oikeuksilla.
+
+![44 tree](https://github.com/user-attachments/assets/b8f5e300-535a-4a9c-b3fb-ed6f3ef0f5c8)
+
+![45 permissions](https://github.com/user-attachments/assets/14d38587-6af5-4f43-93d6-917939f02602)
+
+Seuraavaksi lisäsin kerralla kaksi `cmd.run`-tilafunktiota ja `service`-tilanfunktion. Aiemmin ongelmana oli ollut `service`-tilanfunktion samannimisyys Apachen asennuskomennon kanssa, mutta luennolta saadun neuvon avulla kiersin tämän käyttämällä muotoa "apache2.service".
+
+![46 cmd run](https://github.com/user-attachments/assets/58a59e83-2648-4a20-aa88-d6c727c89a8b)
+
+Nykyisellään koodi ei kuitenkaan ollut tarpeeksi hyvä, koska siitä ei tullut idempotentti.
+
+![47 not idempotent](https://github.com/user-attachments/assets/84f65f29-f7a7-4495-8f6e-88dc349e4359)
+
+Lähdin tarkastelemaan, miten muut kurssilaiset olivat ratkaisseet asian ja törmäsin HannaBurmanin (2024) raportissa `cmd.run`-tilafunktion unless-parametriin. Tarkastin Saltin (2024b) manuaalista lisätietoja parametrista ja komennolla `man test`, miten käytetty `test`-komento toimii. Näiden avulla tein koodiini lisäyksenä ehdon molemmille tilafunktiokomennoille, että ne tarkastavat, onko uusi esimerkkisivu jo laitettu päälle.
+
+![48 cmd run change](https://github.com/user-attachments/assets/1fc9aa4c-7e64-4933-bb49-3666e47b3017)
+
+Tämän muutoksen myötä koodi muuttui idempontentiksi.
+
+![49 idempotency](https://github.com/user-attachments/assets/4b36dd2c-29cc-4cd0-974a-3c1bfae6e27f)
+
+Homman ollessa nyt toiminnassa tarkastin t002:lla `curl`-komennolla miltä sivu näyttää, mutten saanut minkäänlaista sisältöä vastaukseksi.
+
+![50 curl no content](https://github.com/user-attachments/assets/4aae3fa5-ae6e-4883-852f-fd1e6e2938d4)
+
+Tajusin sitten, etten ollut uutta koodia kirjoittaessani määrittänyt minkäänlaista sisältöparametria verkkosivun tiedostolle toisin kuin olin tehnyt aiemmin. Ajattelin tehdä tämän muokkauksen, mutta hylkäsin ajatuksen ja siirryin kokeilemaan suoraan tiedoston muokkaamista ilman sudo-oikeuksia. Kirjauduin SSH:lla oikealle tilille ja lisäsin pienen tekstinpätkän sivulle.
+
+![51 add content](https://github.com/user-attachments/assets/ca9f740f-620b-4263-b48d-071586bc6ed0)
+
+![52 content](https://github.com/user-attachments/assets/255f242c-e4fb-41f1-8650-92c8085001c2)
+
+Nyt `curl localhost` toimi odotuksieni mukaisesti.
+
+![53 curl content](https://github.com/user-attachments/assets/bdb0c676-f53e-4052-a6f8-0b106fc1380f)
+
+Testasin vielä, että tekemäni lisäyksen jälkeen moduli olisi idempotentti, mitä se olikin. Samalla mieleeni tuli, että mikäli olisin lisännyt sisällön parametrina, nyt tekemäni muutos korvautuisi aina kyseisellä parametrillä, joten tämän välttäminen olikin ihan aiheellista.
+
+![54 still idempotent](https://github.com/user-attachments/assets/ef03393f-97a6-4d7c-92ce-acf6d8a394c5)
+
+Alta löytyy vielä sls-tiedoston lopullinen koodi.
+
+```
+apache2:
+  pkg.installed
+/var/www/html/index.html:
+  file.managed:
+    - contents: Oletussivu
+weppimasteri:
+  user.present:
+    - fullname: Weppimasteri
+    - groups:
+      - users
+      - sudo
+    - password: $y$j9T$HkJuB8aDPPY9b1qZAbeiO/$iHwi1gdjkAVe1t07ma0J/HsYAut6YFJkqK3WhdkQUa/
+/etc/apache2/sites-available/esimerkki.conf:
+  file.managed:
+    - source: salt://apache/esimerkki.conf
+/home/weppimasteri/public_html/esimerkki/index.html:
+  file.managed:
+    - user: weppimasteri
+    - group: weppimasteri
+    - mode: 755
+    - makedirs: True
+a2dissite 000-default.conf:
+  cmd.run:
+    - unless: test -L /etc/apache2/sites-enabled/esimerkki.conf
+a2ensite esimerkki.conf:
+  cmd.run:
+    - unless: test -L /etc/apache2/sites-enabled/esimerkki.conf
+apache2.service:
+  service.running:
+    - watch:
+      - file: /etc/apache2/*
+```
+
+![55 full code](https://github.com/user-attachments/assets/bd432c64-3c37-4f86-afe1-332d8d9c181d)
+
 ## Lähdeluettelo
 
 Gonzales, R. 2013. setting password apparently does not work in user.present. Luettavissa: https://groups.google.com/g/salt-users/c/6kQlEYqlPis. Luettu: 19.11.2024.
+
+HannaBurman 2024. H3 Demoni. Luettavissa: https://github.com/HannaBurman/PalvelintenHallinta/blob/main/H3.md. Luettu: 24.11.2024.
 
 Karvinen, T. 2018. Pkg-File-Service – Control Daemons with Salt – Change SSH Server Port. Luettavissa: https://terokarvinen.com/2018/04/03/pkg-file-service-control-daemons-with-salt-change-ssh-server-port/?fromSearch=karvinen%20salt%20ssh. Luettu: 19.11.2024.
 
