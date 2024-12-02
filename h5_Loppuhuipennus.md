@@ -206,7 +206,81 @@ Koneen t002 puolella myöskään ei ollut jäänyt env-ympäristö päälle.
 
 Mietin kokonaan deactive-kohdan poistamista koodista, sillä se ei selvästikään toiminut (sama virheilmoitus komennon puuttumisesta kuin edellä sourcen kanssa). Vaihtoehtoisesti minun pitäisi mahdollisesti etsiä toinen toteutustapa, koska kyseenalaistin sen, kuinka pitkään env-ympäristössä todella pysytään.
 
-*2:45*
+*2:55*
+
+Pitkällisen mietinnän ja tiedon etsimisen jälkeen päätin yrittää rakentaa yhtenäisen kokonaisuuden env-virtuaaliympäristön aktivoimisesta, Djangon asentamisesta ja Django-projektin aloituksesta. Saltin cmd-tilafunktion manuaalin (VMware 2024b) avulla lähdin hakemaan parametreja, joita uskoin tarvitsevani `cmd.run`-komennon kanssa. Lisäksi tutkin require-parametrin toimintaa Requisites manuaalista (VMware 2024a). Huomioiden, miten esim. tiedosto ja paketti vaatimukset oli merkitty, tein arvauksen, että komentojen ehdon kirjoitusmuoto olisi "cmd". Lisäksi, koska tarvitsisin requirements-tekstitiedostoa Djangon asentamiseen, tein tätä varten file.managed-tilafunktion. Lisäksi kommentoin edellä kirjoittamani activate- ja deactivate-koodipätkät.
+
+![42 startproject require](https://github.com/user-attachments/assets/547abf2a-ab8f-4e6d-b6ed-44b2a7a7c977)
+
+Tutut komennot `sudo systemctl restart salt-master.service` ja `sudo salt '*' state.apply modduli` näyttivät, ettei homma mennyt putkeen.
+
+![43 require missing](https://github.com/user-attachments/assets/34d68731-a485-460a-8b31-d36ab7682a26)
+
+Saadun virheilmoituksen perusteella tulkitsin, että komentojen esiintyminen ei pelkästään riittäisi, vaan ne tulisi erottaa myös omiksi komennoikseen, joten tein näin.
+
+![44 require separate](https://github.com/user-attachments/assets/e0d00ee8-7738-4cc1-b310-521678734d9a)
+
+Tuloksena activate-komento onnistui odotetusti, mutta Djangon asennus epäonnistui, minkä myötä myös kokonaisuus epäonnistui.
+
+![45 pip fail](https://github.com/user-attachments/assets/858363ff-49e0-4c89-9446-0040b56fdad1)
+
+Epäilin, että ongelma liittyi jälleen virtuaaliympäristöön, koska en edelleenkään uskonut, että env-tilassa pysyttiin onnistuneesti. Kommentoin kokonaan edellä kirjoittamani asennuskokonaisuuden sekä deactivate-koodipätkän ja lisäsin testimielessä `which pip`-komennon koodiin.
+
+![46 which pip](https://github.com/user-attachments/assets/473ac1ed-76e5-4881-93d6-b05d363d72d1)
+
+Tämäkin epäonnistui, joskin mitään selvää virheilmoitusta ei tällä kertaa tullut toisin kuin edellisissä kohdissa.
+
+![46 5 which pip fail](https://github.com/user-attachments/assets/fd3c2d31-b9e2-4bd8-a8ad-d0e15b61934f)
+
+Muokkasin koodin luomaan tekstitiedoston, johon tulostuisi komennon sisältö. Ajattelin tällä tavalla saavani selville Pipin version.
+
+![47 which txt](https://github.com/user-attachments/assets/443c2307-e829-4a3a-9813-29aabfb9cffe)
+
+Tämäkin epäonnistui.
+
+![48 which txt fail](https://github.com/user-attachments/assets/01b6a60a-a230-428c-9f69-15e6cc964877)
+
+Tarkastin t002:lla miltä asia näytti sillä puolella, ja vaikka tekstitiedosto oli luotu, ei sillä ollut minkäänlaista sisältöä.
+
+![49 txt no content](https://github.com/user-attachments/assets/b722d52d-78b7-47bf-9a34-468b4cbd256e)
+
+Tämä viittasi mielestäni selvästi siihen, että ajettaessa komento `which pip` ei oltu enää env-ympäristössä. Ongelma olisi siis, että Saltilla ajettu komento `. /home/weppimasteri/env/bin/activate` oli vain hetkellinen eikä pidempään jatkuva. Etsin Googlen avulla apua vaihtoehtoiseen toteutukseen ja päädyin Saltin manuaaliin virtualenv-tilafunktiosta (VMware 2024c). En saanut pelkällä manuaalilla täydellistä kuvaa, miten se toimisi todellisuudessa, joten yritin etsiä Googlella lisää apua tässä kuitenkaan onnistumatta. Tämän takia lähdin tekemään omaa viritystäni aiheesta manuaalin pohjalta. Kommentoin myös muut edellä kirjoittamani koodipätkät, jotka saattoivat liittyä asiaan.
+
+![50 virtualenv_mod managed](https://github.com/user-attachments/assets/3e0279d8-7aaf-4e3b-8a9e-be865e84b971)
+
+![51 mod not available](https://github.com/user-attachments/assets/3bfc09bc-72c3-413c-8ca5-f72fe05b7581)
+
+Uusi virheviesti, jonka syytä en saanut tulkittua Googlen avulla. Hieman sivuavaa keskustelua aiheesta tuli vastaan, mutta kaikki selaamani sivut tuntuivat käsittelevän vähän eri asiaa. Päädyinkin muokkaamaan hieman name-parametrin polkua, koska ajattelin ymmärtäneeni manuaalin (VMware 2024c) väärin.
+
+![52 mod name change](https://github.com/user-attachments/assets/82dbef28-8e05-4a61-9dc3-806aa4136340)
+
+Sama virheviesti jatkui edelleen, joten jatkoin Googlen selaamista. Kiinnitin huomiota tässä vaiheessa siihen, että vaikka olin käyttänyt hakusanaa "virtualenv_mod" sain hakutuloksissa suhteellisen paljon pelkkää "virtualenv" muotoa. Toisaalta myös manuaalin "VMware 2024c) sivun nimi oli jälkimmäisessä muodossa, vaikka sivulla olevissa komennoissa oli käytetty mod-muotoa. Päätin muokata tämän omassa koodissani pelkkään "virtualenv"-muotoon.
+
+![53 virtualenv change](https://github.com/user-attachments/assets/3738f323-f881-45fc-a103-b65794b062f5)
+
+Virheviesti muuttui tällä kertaa, joten tältä kannalta muutos lieni oikea.
+
+![54 virtualenv fail](https://github.com/user-attachments/assets/d0686c49-a06e-446d-91d1-1ca53a44ac6f)
+
+Koska virheilmoituksessa valitettiin sitä, että kohde oli jo olemassa, muutin nimenä olevana olevaa polkua.
+
+![55 virtualenv name change](https://github.com/user-attachments/assets/aab1410a-ffe0-429d-81c3-2919eee3eacc)
+
+Taas uusi virheviesti. Tällä kertaa syynä oikeuksien puuttuminen kyseiseen kansioon.
+
+![55 5 env bin fail](https://github.com/user-attachments/assets/97dfe64c-c2f3-410f-bf2b-84855f5c64ea)
+
+Muutin sijainniksi nyt kotihakemiston, minkä lisäksi lisäsin manuaalista (VMware 2024c) venv_bin-parametrin.
+
+![56 venv](https://github.com/user-attachments/assets/a243fb7b-f49e-4d7d-b9ea-85c371a07d04)
+
+Yhteydessä oli viivettä, joten odottelin hetken ennen kahden tutun komennon ajamista uudelleen. Lopputuloksena oli erittäin pitkä virheviesti, joka ei mahtunut kokonaisuudessaan ruudulleni.
+
+![57 lag](https://github.com/user-attachments/assets/3a1e4c7d-f0cd-43b7-ae9b-113c7fddb36f)
+
+![58 module missing](https://github.com/user-attachments/assets/886e08f9-904e-4778-97fd-80242ea547d1)
+
+*5:02*
 
 ## Lähdeluettelo
 
@@ -216,6 +290,8 @@ LeeviRaussi 2024a. h6 Hello Django. Luettavissa: https://github.com/LeeviRaussi/
 
 LeeviRaussi 2024b. h4 Puolikas. Luettavissa: https://github.com/LeeviRaussi/Palvelinten_hallinta/blob/main/h4_Puolikas.md. Luettu: 30.11.2024.
 
-VMware, Inc. 2024a. Requisites and Other Global State Arguments. Luettavissa: https://docs.saltproject.io/en/latest/ref/states/requisites.html. Luettu: 1.12.2024.
+VMware, Inc. 2024a. Requisites and Other Global State Arguments. Luettavissa: https://docs.saltproject.io/en/latest/ref/states/requisites.html. Luettu: 2.12.2024.
 
-VMware, Inc. 2024b. salt.states.cmd. Luettavissa: https://docs.saltproject.io/en/latest/ref/states/all/salt.states.cmd.html. Luettu: 30.11.2024.
+VMware, Inc. 2024b. salt.states.cmd. Luettavissa: https://docs.saltproject.io/en/latest/ref/states/all/salt.states.cmd.html. Luettu: 2.12.2024.
+
+VMware, Inc. 2024c. salt.states.virtualenv. Luettavissa: https://docs.saltproject.io/en/latest/ref/states/all/salt.states.virtualenv_mod.html. Luettu: 2.12.2024.
